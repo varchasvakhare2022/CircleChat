@@ -18,3 +18,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 # CORS configuration
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
 
+# WebSocket configuration
+WS_MAX_CONNECTIONS = int(os.getenv("WS_MAX_CONNECTIONS", 100))
+WS_HEARTBEAT_INTERVAL = int(os.getenv("WS_HEARTBEAT_INTERVAL", 30))
+
