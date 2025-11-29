@@ -55,12 +55,12 @@ async def create_invite(
             code = generate_invite_code().upper()
             existing = await db.invites.find_one({"code": code})
         
-        # Create invite (expires in 7 days)
+        # Create permanent invite (no expiration)
         invite = Invite(
             group_id=group_id,
             code=code,
             created_by=user_id,
-            expires_at=datetime.utcnow() + timedelta(days=7)
+            expires_at=None  # Permanent invite - no expiration
         )
         
         invite_dict = invite.model_dump(by_alias=True, exclude={"id"})
@@ -94,7 +94,7 @@ async def get_invite(
         if not invite:
             raise HTTPException(status_code=404, detail="Invite not found")
         
-        # Check if expired
+        # Check if expired (optional - can be removed if you want permanent invites)
         expires_at = invite.get("expires_at")
         if expires_at:
             # MongoDB returns datetime objects, but handle string case too
@@ -106,9 +106,7 @@ async def get_invite(
             if expires_at < datetime.utcnow():
                 raise HTTPException(status_code=410, detail="Invite has expired")
         
-        # Check if already used
-        if invite.get("used", False):
-            raise HTTPException(status_code=410, detail="Invite has already been used")
+        # Invites are now permanent and reusable - no "used" check
         
         # Get group info
         group = await db.groups.find_one({"_id": ObjectId(invite["group_id"])})
@@ -149,7 +147,7 @@ async def accept_invite(
         
         print(f"Found invite: {invite}")
         
-        # Check if expired
+        # Check if expired (optional - can be removed if you want permanent invites)
         expires_at = invite.get("expires_at")
         if expires_at:
             # MongoDB returns datetime objects, but handle string case too
@@ -161,9 +159,7 @@ async def accept_invite(
             if expires_at < datetime.utcnow():
                 raise HTTPException(status_code=410, detail="Invite has expired")
         
-        # Check if already used
-        if invite.get("used", False):
-            raise HTTPException(status_code=410, detail="Invite has already been used")
+        # Invites are now permanent and reusable - no "used" check
         
         group_id = invite["group_id"]
         
@@ -177,11 +173,7 @@ async def accept_invite(
         
         # Check if user is already a member
         if user_id in group.get("member_ids", []):
-            # Mark invite as used anyway
-            await db.invites.update_one(
-                {"code": invite_code},
-                {"$set": {"used": True}}
-            )
+            # User is already a member - invite is still valid for others
             return {"message": "Already a member", "group_id": group_id}
         
         # Add user to group
@@ -194,11 +186,7 @@ async def accept_invite(
         )
         print(f"Group update result: {result.modified_count} documents modified")
         
-        # Mark invite as used
-        await db.invites.update_one(
-            {"code": invite_code},
-            {"$set": {"used": True}}
-        )
+        # Invites are permanent and reusable - don't mark as used
         
         print(f"User {user_id} successfully joined group {group_id}")
         return {"message": "Joined group successfully", "group_id": group_id}

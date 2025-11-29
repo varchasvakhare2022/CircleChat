@@ -167,4 +167,22 @@ export const signalingAPI = {
   }
 };
 
+// Users API
+export const usersAPI = {
+  getProfile: async () => {
+    const response = await api.get('/users/me');
+    return response.data;
+  },
+  
+  updateProfile: async (displayName) => {
+    const response = await api.put('/users/me', { display_name: displayName });
+    return response.data;
+  },
+  
+  getUserProfile: async (userId) => {
+    const response = await api.get(`/users/profile/by-id/${userId}`);
+    return response.data;
+  }
+};
+
 export default api;

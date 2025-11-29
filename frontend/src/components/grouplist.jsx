@@ -80,6 +80,13 @@ const GroupList = () => {
           <h1>CircleChat</h1>
           <div className="user-info">
             <span className="username">{user?.username || user?.firstName || 'User'}</span>
+            <button 
+              onClick={() => navigate('/settings')} 
+              className="settings-button"
+              title="Settings"
+            >
+              ⚙️
+            </button>
             <button onClick={handleSignOut} className="logout-button">
               Sign Out
             </button>

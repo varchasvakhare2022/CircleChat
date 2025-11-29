@@ -56,6 +56,32 @@ async def get_user_info_from_clerk(user_id: str) -> Optional[Dict]:
     
     return None
 
+def extract_username_from_clerk_data(user_info: Dict) -> Optional[str]:
+    """Extract the best available username from Clerk user data"""
+    if not user_info:
+        return None
+    
+    # Try different fields in order of preference
+    # Clerk API returns: first_name, last_name, username, email_addresses
+    first_name = user_info.get("first_name")
+    last_name = user_info.get("last_name")
+    username = user_info.get("username")
+    
+    # Combine first and last name if available
+    if first_name and last_name:
+        return f"{first_name} {last_name}"
+    elif first_name:
+        return first_name
+    elif username:
+        return username
+    elif user_info.get("email_addresses"):
+        # Use email prefix as fallback
+        email = user_info.get("email_addresses", [{}])[0].get("email_address", "")
+        if email:
+            return email.split("@")[0]
+    
+    return None
+
 async def verify_token(credentials: Optional[HTTPAuthorizationCredentials] = Security(security)):
     """
     Verify Clerk JWT token (optional in development)
@@ -128,24 +154,33 @@ async def get_current_user_id(credentials: Optional[HTTPAuthorizationCredentials
         print(f"Auth error (allowing in dev): {str(e)}")
         return "dev_user"
 
-async def get_current_user_info(credentials: Optional[HTTPAuthorizationCredentials] = Security(security)) -> Dict:
+async def get_current_user_info(credentials: Optional[HTTPAuthorizationCredentials] = Security(security), db = None) -> Dict:
     """
     Get current user information including username
+    If db is provided, will check for custom display name in user profile
     """
     try:
         token_data = await verify_token(credentials)
         user_id = token_data.get("user_id") or token_data.get("sub") or "dev_user"
         username = token_data.get("username")
         
+        # Check for custom display name in database first
+        if db is not None and user_id != "dev_user":
+            try:
+                profile = await db.user_profiles.find_one({"user_id": user_id})
+                if profile and profile.get("display_name"):
+                    return {
+                        "user_id": user_id,
+                        "username": profile.get("display_name")
+                    }
+            except Exception as e:
+                print(f"Error fetching user profile: {str(e)}")
+        
         # If we don't have username, try to get it from Clerk API
         if not username or username == "dev" or username == "User":
             user_info = await get_user_info_from_clerk(user_id)
             if user_info:
-                username = (
-                    user_info.get("username") or
-                    user_info.get("first_name") or
-                    user_info.get("email_addresses", [{}])[0].get("email_address", "").split("@")[0] if user_info.get("email_addresses") else None
-                )
+                username = extract_username_from_clerk_data(user_info)
         
         return {
             "user_id": user_id,

@@ -1,16 +1,17 @@
 """
 Groups routes
 """
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List
+from fastapi import APIRouter, HTTPException, Depends, Security
+from fastapi.security import HTTPAuthorizationCredentials
+from typing import List, Optional
 from datetime import datetime
 from bson import ObjectId
 import secrets
 import string
 
 from ..db import get_db
-from ..models import Group, GroupCreate, GroupResponse, Message, MessageCreate, MessageResponse
-from ..auth import get_current_user_id, get_current_user_info
+from ..models import Group, GroupCreate, GroupResponse, Message, MessageCreate, MessageResponse, MemberInfo
+from ..auth import get_current_user_id, get_current_user_info, security
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -124,6 +125,41 @@ async def get_group(
     # Include member_ids if user is the owner (for member management)
     if user_id == group.get("owner_id"):
         response.member_ids = group.get("member_ids", [])
+    
+    # Fetch member details with display names and emails for all members
+    members = []
+    for member_id in group.get("member_ids", []):
+        member_info = {"user_id": member_id, "display_name": None, "email": None}
+        
+        # Get display name from user profile
+        profile = await db.user_profiles.find_one({"user_id": member_id})
+        if profile and profile.get("display_name"):
+            member_info["display_name"] = profile.get("display_name")
+        
+        # Get email and name from Clerk
+        try:
+            from ..auth import get_user_info_from_clerk, extract_username_from_clerk_data
+            if member_id != "dev_user":
+                clerk_info = await get_user_info_from_clerk(member_id)
+                if clerk_info:
+                    # Get email
+                    if "email_addresses" in clerk_info and len(clerk_info["email_addresses"]) > 0:
+                        member_info["email"] = clerk_info["email_addresses"][0].get("email_address")
+                    
+                    # Get display name if not set from profile
+                    if not member_info["display_name"]:
+                        member_info["display_name"] = extract_username_from_clerk_data(clerk_info)
+        except Exception as e:
+            print(f"Error fetching Clerk info for {member_id}: {str(e)}")
+        
+        # Fallback display name
+        if not member_info["display_name"]:
+            member_info["display_name"] = member_id if member_id == "dev_user" else "User"
+        
+        members.append(member_info)
+    
+    # Include member details for all users (so everyone can see member names)
+    response.members = [MemberInfo(**m) for m in members]
     
     return response
 
@@ -257,23 +293,54 @@ async def get_messages(
     messages = await cursor.to_list(length=limit)
     messages.reverse()  # Reverse to show oldest first
     
-    return [
-        MessageResponse(
+    # Fetch display names for all messages
+    result = []
+    for msg in messages:
+        message_user_id = msg.get("user_id")
+        display_name = "User"  # Default fallback
+        
+        if message_user_id and message_user_id != "dev_user":
+            # First, check user profile for custom display name
+            profile = await db.user_profiles.find_one({"user_id": message_user_id})
+            if profile and profile.get("display_name"):
+                display_name = profile.get("display_name")
+            else:
+                # Try to get from Clerk
+                try:
+                    from ..auth import get_user_info_from_clerk, extract_username_from_clerk_data
+                    user_info = await get_user_info_from_clerk(message_user_id)
+                    if user_info:
+                        clerk_name = extract_username_from_clerk_data(user_info)
+                        if clerk_name:
+                            display_name = clerk_name
+                except Exception as e:
+                    print(f"Error fetching Clerk info for {message_user_id}: {str(e)}")
+                    # If all else fails, try to use stored username if it's not "User" or "dev"
+                    stored_username = msg.get("username", "")
+                    if stored_username and stored_username not in ["User", "dev", "dev_user"]:
+                        display_name = stored_username
+        else:
+            # For dev_user, use stored username or default
+            stored_username = msg.get("username", "")
+            if stored_username and stored_username not in ["User", "dev", "dev_user"]:
+                display_name = stored_username
+        
+        result.append(MessageResponse(
             id=str(msg["_id"]),
             group_id=msg["group_id"],
-            user_id=msg["user_id"],
-            username=msg["username"],
+            user_id=message_user_id,
+            username=display_name,  # Use fetched display name
             content=msg["content"],
-            created_at=msg["created_at"]
-        )
-        for msg in messages
-    ]
+            created_at=msg.get("created_at")
+        ))
+    
+    return result
 
 @router.post("/{group_id}/messages", response_model=MessageResponse, status_code=201)
 async def send_message(
     group_id: str,
     message_data: MessageCreate,
-    user_info: dict = Depends(get_current_user_info),
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(security),
     db = Depends(get_db)
 ):
     """Send a message to a group"""
@@ -283,8 +350,29 @@ async def send_message(
     if not ObjectId.is_valid(group_id):
         raise HTTPException(status_code=400, detail="Invalid group ID")
     
+    # Get user info with database access for display name lookup
+    user_info = await get_current_user_info(credentials, db=db)
     user_id = user_info.get("user_id")
-    username = user_info.get("username", "User")
+    
+    # Fetch display name from user profile or Clerk
+    username = "User"  # Default
+    if user_id and user_id != "dev_user":
+        # Check user profile for custom display name
+        profile = await db.user_profiles.find_one({"user_id": user_id})
+        if profile and profile.get("display_name"):
+            username = profile.get("display_name")
+        else:
+            # Try to get from Clerk
+            try:
+                from ..auth import get_user_info_from_clerk, extract_username_from_clerk_data
+                clerk_info = await get_user_info_from_clerk(user_id)
+                if clerk_info:
+                    clerk_name = extract_username_from_clerk_data(clerk_info)
+                    if clerk_name:
+                        username = clerk_name
+            except:
+                # Fallback to username from user_info
+                username = user_info.get("username", "User")
     
     # Verify user is a member
     group = await db.groups.find_one({"_id": ObjectId(group_id)})

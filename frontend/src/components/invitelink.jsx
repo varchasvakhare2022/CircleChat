@@ -83,52 +83,67 @@ const InviteLink = () => {
 
   return (
     <div className="invite-link-container">
-      <div className="invite-link-card">
+      <div className="invite-link-header">
+        <button
+          onClick={() => navigate(`/group/${groupId}`)}
+          className="back-button"
+        >
+          ←
+        </button>
         <h2>Invite Friends</h2>
-        <p className="subtitle">Share this link with your friends to join the group</p>
+      </div>
 
-        {loading && !inviteCode ? (
-          <div className="loading">Generating invite link...</div>
-        ) : (
-          <>
-            <div className="invite-link-section">
-              <div className="invite-link-box">
-                <input
-                  type="text"
-                  value={inviteUrl}
-                  readOnly
-                  className="invite-link-input"
-                />
+      <div className="invite-link-content">
+        <div className="invite-link-card">
+          <p className="subtitle">Share this link with your friends to join the group</p>
+
+          {loading && !inviteCode ? (
+            <div className="loading">Generating invite link...</div>
+          ) : (
+            <>
+              <div className="invite-link-section">
+                <div className="invite-link-box">
+                  <input
+                    type="text"
+                    value={inviteUrl}
+                    readOnly
+                    className="invite-link-input"
+                  />
+                  <button
+                    onClick={copyToClipboard}
+                    className={`copy-button ${copied ? 'copied' : ''}`}
+                    disabled={!inviteCode}
+                  >
+                    {copied ? '✓ Copied!' : 'Copy Link'}
+                  </button>
+                </div>
+                
+                <div className="invite-code-display">
+                  <p className="invite-code">Invite Code</p>
+                  <strong>{inviteCode}</strong>
+                </div>
+              </div>
+
+              {error && <div className="error-message">{error}</div>}
+
+              <div className="invite-actions">
                 <button
-                  onClick={copyToClipboard}
-                  className="copy-button"
-                  disabled={!inviteCode}
+                  onClick={() => navigate(`/group/${groupId}`)}
+                  className="back-button"
                 >
-                  {copied ? '✓ Copied!' : 'Copy Link'}
+                  Back
+                </button>
+                <button
+                  onClick={loadInvite}
+                  className="refresh-button"
+                  disabled={loading}
+                >
+                  Generate New Link
                 </button>
               </div>
-              <p className="invite-code">Invite Code: <strong>{inviteCode}</strong></p>
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <div className="invite-actions">
-              <button
-                onClick={() => navigate(`/group/${groupId}`)}
-                className="back-button"
-              >
-                Back to Group
-              </button>
-              <button
-                onClick={loadInvite}
-                className="refresh-button"
-                disabled={loading}
-              >
-                Generate New Link
-              </button>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

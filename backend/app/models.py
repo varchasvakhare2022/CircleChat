@@ -23,6 +23,11 @@ class GroupCreate(BaseModel):
     name: str
     description: Optional[str] = None
 
+class MemberInfo(BaseModel):
+    user_id: str
+    display_name: Optional[str] = None
+    email: Optional[str] = None
+
 class GroupResponse(BaseModel):
     id: str
     name: str
@@ -30,6 +35,7 @@ class GroupResponse(BaseModel):
     owner_id: str
     member_count: int
     member_ids: Optional[List[str]] = None  # Include member IDs for owner management
+    members: Optional[List[MemberInfo]] = None  # Include member details with display names and emails
     created_at: datetime
     updated_at: datetime
 
@@ -68,3 +74,21 @@ class Invite(BaseModel):
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True
+
+class UserProfile(BaseModel):
+    id: Optional[str] = Field(default=None, alias="_id")
+    user_id: str  # Clerk user ID
+    display_name: Optional[str] = None  # Custom display name
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        populate_by_name = True
+        arbitrary_types_allowed = True
+
+class UserProfileUpdate(BaseModel):
+    display_name: str
+
+class UserProfileResponse(BaseModel):
+    user_id: str
+    display_name: Optional[str] = None

@@ -116,6 +116,33 @@ class WebSocketService {
     });
   }
 
+  startCall(callType, callerName) {
+    return this.send({
+      type: 'call_start',
+      call_type: callType, // 'voice' or 'video'
+      caller_name: callerName
+    });
+  }
+
+  endCall() {
+    return this.send({
+      type: 'call_end'
+    });
+  }
+
+  acceptCall(acceptorName) {
+    return this.send({
+      type: 'call_accept',
+      acceptor_name: acceptorName
+    });
+  }
+
+  declineCall() {
+    return this.send({
+      type: 'call_decline'
+    });
+  }
+
   on(event, callback) {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);

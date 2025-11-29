@@ -6,7 +6,9 @@ import CreateGroup from './components/creategroup';
 import Chatroom from './components/chatroom';
 import InviteLink from './components/invitelink';
 import VoiceCall from './components/voicecall';
+import Settings from './components/settings';
 import './styles.css';
+import './components/auth/auth.css';
 
 // Get Clerk publishable key from environment or use a default
 const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
@@ -21,7 +23,53 @@ const App = () => {
   }
 
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider 
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+      appearance={{
+        baseTheme: 'dark',
+        variables: {
+          colorPrimary: '#d4af37',
+          colorText: '#ffffff',
+          colorBackground: '#000000',
+          colorInputBackground: '#0a0a0a',
+          colorInputText: '#ffffff',
+          borderRadius: '8px',
+        },
+        elements: {
+          rootBox: {
+            width: '100%',
+          },
+          card: {
+            backgroundColor: '#0a0a0a',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 175, 55, 0.1)',
+          },
+          headerTitle: {
+            color: '#ffffff',
+          },
+          headerSubtitle: {
+            color: 'rgba(212, 175, 55, 0.8)',
+          },
+          socialButtonsBlockButton: {
+            backgroundColor: '#1a1a1a',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            color: '#ffffff',
+          },
+          formButtonPrimary: {
+            backgroundColor: '#d4af37',
+            color: '#000000',
+            '&:hover': {
+              backgroundColor: '#f4d03f',
+            },
+          },
+          formFieldInput: {
+            backgroundColor: '#1a1a1a',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            color: '#ffffff',
+          },
+        },
+      }}
+    >
       <Router>
         <AppRoutes />
       </Router>
@@ -54,13 +102,19 @@ const AppRoutes = () => {
             <Navigate to="/groups" replace />
           ) : (
             <div className="auth-container">
-              <SignIn 
-                routing="path" 
-                path="/sign-in" 
-                signUpUrl="/sign-up"
-                afterSignInUrl="/groups"
-                redirectUrl="/groups"
-              />
+              <div className="auth-wrapper">
+                <div className="auth-brand">
+                  <h1 className="auth-brand-title">CircleChat</h1>
+                  <p className="auth-brand-subtitle">Connect with your circles</p>
+                </div>
+                <SignIn 
+                  routing="path" 
+                  path="/sign-in" 
+                  signUpUrl="/sign-up"
+                  afterSignInUrl="/groups"
+                  redirectUrl="/groups"
+                />
+              </div>
             </div>
           )
         }
@@ -72,13 +126,19 @@ const AppRoutes = () => {
             <Navigate to="/groups" replace />
           ) : (
             <div className="auth-container">
-              <SignUp 
-                routing="path" 
-                path="/sign-up" 
-                signInUrl="/sign-in"
-                afterSignUpUrl="/groups"
-                redirectUrl="/groups"
-              />
+              <div className="auth-wrapper">
+                <div className="auth-brand">
+                  <h1 className="auth-brand-title">CircleChat</h1>
+                  <p className="auth-brand-subtitle">Join the conversation</p>
+                </div>
+                <SignUp 
+                  routing="path" 
+                  path="/sign-up" 
+                  signInUrl="/sign-in"
+                  afterSignUpUrl="/groups"
+                  redirectUrl="/groups"
+                />
+              </div>
             </div>
           )
         }
@@ -88,6 +148,14 @@ const AppRoutes = () => {
         element={
           <PrivateRoute>
             <GroupList />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <PrivateRoute>
+            <Settings />
           </PrivateRoute>
         }
       />
