@@ -1,0 +1,1342 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Circlechat Frontend",
+    "version": "v1",
+    "description": "API documentation for Circlechat Frontend",
+    "contact": {
+      "name": "API Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.example.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/users/me": {
+      "get": {
+        "summary": "The GET /users/me endpoint retrieves the profile information of the currently authenticated user. Th",
+        "description": "The GET /users/me endpoint retrieves the profile information of the currently authenticated user. This endpoint is primarily used in applications where users need to access their profile details, such as display names, for personalization and user experience enhancements. Common error scenarios include database connection issues, which may result in a 500 Internal Server Error if the database is not connected or if there are issues retrieving the user's profile. There are no pagination or rate limiting considerations evident from the code, and security requirements imply that the user must be authenticated to access their profile information.",
+        "operationId": "get_users_me",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "example": "20"
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "example": "English"
+                    }
+                  }
+                },
+                "example": {
+                  "user_id": "user_12345",
+                  "display_name": "JohnDoe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "The PUT /users/me endpoint allows authenticated users to update their profile information, specifica",
+        "description": "The PUT /users/me endpoint allows authenticated users to update their profile information, specifically their display name. This endpoint is primarily used when a user wants to modify their profile details to reflect a new display name. Common error scenarios include providing an empty display name or exceeding the character limit of 50, which will result in a 400 Bad Request response. Additionally, if there are issues connecting to the database, a 500 Internal Server Error will be returned. Security requirements include user authentication to ensure that only the current user can update their profile.",
+        "operationId": "put_users_me",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "profile_data",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "example": "20"
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "example": "English"
+                    }
+                  }
+                },
+                "example": {
+                  "user_id": "user123",
+                  "display_name": "New Display Name"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "The root endpoint serves as a health check for the CircleChat API, confirming that the service is op",
+        "description": "The root endpoint serves as a health check for the CircleChat API, confirming that the service is operational. It is primarily used during development and monitoring to ensure that the API is running correctly. Since the endpoint does not require any input, there are no specific error scenarios associated with it; however, a failure to respond could indicate server issues. There are no performance concerns such as pagination or rate limiting for this endpoint, and it does not require authentication or authorization, making it accessible for general use.",
+        "operationId": "get_root",
+        "tags": [
+          "Flask"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "example_message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "CircleChat API is running"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "The /health endpoint is designed to provide a quick health check for the service, indicating whether",
+        "description": "The /health endpoint is designed to provide a quick health check for the service, indicating whether it is operational. This endpoint is primarily used by monitoring tools and system administrators to ensure that the application is running smoothly. Since the endpoint does not involve complex processing, it is expected to return a successful response without any errors under normal circumstances. There are no specific performance considerations such as pagination or rate limiting for this endpoint, and it does not require authentication or authorization.",
+        "operationId": "get_health",
+        "tags": [
+          "Flask"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "example_status"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "healthy"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/test-users-route": {
+      "get": {
+        "summary": "The /test-users-route endpoint serves as a verification point to confirm that the users router is co",
+        "description": "The /test-users-route endpoint serves as a verification point to confirm that the users router is correctly loaded in the application. It is primarily used during development or testing phases to ensure that the expected user-related routes are available. Common error scenarios are minimal since this endpoint does not require input parameters and is unlikely to fail unless there is a significant issue with the server. There are no specific performance considerations such as pagination or rate limiting evident from the code. Security requirements are also minimal, as this endpoint does not appear to require authentication or authorization.",
+        "operationId": "get_test_users_route",
+        "tags": [
+          "Flask"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "example_message"
+                    },
+                    "routes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Users router is loaded",
+                  "routes": [
+                    "GET /users/me",
+                    "PUT /users/me",
+                    "GET /users/profile/by-id/{user_id}"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{full_path:path}": {
+      "options": {
+        "summary": "The OPTIONS /{full_path:path} endpoint is designed to handle CORS preflight requests, allowing clien",
+        "description": "The OPTIONS /{full_path:path} endpoint is designed to handle CORS preflight requests, allowing clients to determine the HTTP methods and headers that are supported by the server for a specific resource. This is particularly useful in web applications where cross-origin requests are made, ensuring that the client can safely interact with the server. Since this endpoint does not involve any request body or complex error handling, the primary response is a simple acknowledgment of the request. Ther",
+        "operationId": "options_full_path_path",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "full_path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "full_path:path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: full_path:path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "example_message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Your message here."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{group_id}": {
+      "get": {
+        "summary": "This endpoint retrieves detailed information about a specific group identified by the group_id. It i",
+        "description": "This endpoint retrieves detailed information about a specific group identified by the group_id. It is primarily used by authenticated users to access group details, including member information, provided they are members of the group. Common error scenarios include invalid group IDs (HTTP 400), unauthorized access for non-members (HTTP 403), and cases where the group does not exist (HTTP 404). The endpoint requires users to be authenticated and checks membership status to ensure that only authorized users can access the group's information.",
+        "operationId": "get_group_id",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: group_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": "60d5ec49f1a2c8b2a8e0c1f4",
+                  "name": "Sample Group",
+                  "description": "This is a sample group description.",
+                  "owner_id": "user_123",
+                  "member_count": 5,
+                  "created_at": "2023-01-01T12:00:00Z",
+                  "updated_at": "2023-01-10T12:00:00Z",
+                  "members": [
+                    {
+                      "user_id": "user_456",
+                      "display_name": "John Doe",
+                      "email": "john.doe@example.com"
+                    },
+                    {
+                      "user_id": "user_789",
+                      "display_name": "Jane Smith",
+                      "email": "jane.smith@example.com"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{group_id}/join": {
+      "post": {
+        "summary": "This endpoint allows a user to join a specific group identified by the group_id. It is primarily use",
+        "description": "This endpoint allows a user to join a specific group identified by the group_id. It is primarily used in applications where users can collaborate or communicate within groups, such as social networks or team management tools. Common error scenarios include invalid group IDs, non-existent groups, and attempts to join a group when already a member. Performance considerations are minimal, but the endpoint should be protected against excessive requests to prevent abuse. Security requirements include user authentication to ensure that only logged-in users can join groups.",
+        "operationId": "post_group_id_join",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: group_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "example_message"
+                    },
+                    "group_id": {
+                      "type": "string",
+                      "example": "20"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Joined group successfully",
+                  "group_id": "1234567890abcdef12345678"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{group_id}/leave": {
+      "delete": {
+        "summary": "This DELETE endpoint allows a user to leave a specified group by its ID. It is primarily used in sce",
+        "description": "This DELETE endpoint allows a user to leave a specified group by its ID. It is primarily used in scenarios where a user no longer wishes to be a member of a group, ensuring that group membership is managed effectively. Common error scenarios include attempting to leave a group that the user is not a member of, trying to leave a group as the owner without transferring ownership, or providing an invalid group ID. There are no specific performance considerations such as pagination or rate limiting evident from the code. Security requirements include user authentication, as the endpoint relies on the current user's ID to validate membership before allowing the action.",
+        "operationId": "delete_group_id_leave",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: group_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "example_message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Left group successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{group_id}/members/{member_id}": {
+      "delete": {
+        "summary": "This DELETE endpoint is designed to remove a member from a specified group, with the primary use cas",
+        "description": "This DELETE endpoint is designed to remove a member from a specified group, with the primary use case being group management by the owner. It is essential for maintaining group integrity and ensuring that only authorized individuals can modify membership. Common error scenarios include attempting to remove a non-member, invalid group IDs, and permission issues when a non-owner tries to remove a member. There are no specific performance considerations such as pagination or rate limiting evident in the code. Security requirements dictate that only the group owner can perform this action, necessitating user authentication to verify ownership.",
+        "operationId": "delete_group_id_members_member_id",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "member_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: group_id"
+          },
+          {
+            "name": "member_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: member_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "example_message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Member removed successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{group_id}/messages": {
+      "get": {
+        "summary": "Get messages for a group",
+        "description": "Get messages for a group",
+        "operationId": "get_group_id_messages",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: group_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "This endpoint allows users to send messages to a specific group identified by the group_id. It is pr",
+        "description": "This endpoint allows users to send messages to a specific group identified by the group_id. It is primarily used in messaging applications where users need to communicate within groups. Common error scenarios include providing an invalid group ID, attempting to send a message without being a member of the group, or encountering database connection issues. Performance considerations are not explicitly mentioned in the code, but typical messaging applications may require efficient handling of concurrent requests. Security requirements include proper authentication and authorization to ensure that only valid group members can send messages.",
+        "operationId": "post_group_id_messages",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "message_data",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "credentials",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: group_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "object"
+                    },
+                    "properties": {
+                      "type": "object"
+                    }
+                  },
+                  "required": []
+                },
+                "example": {
+                  "type": {
+                    "id": 1,
+                    "name": "Sample type"
+                  },
+                  "properties": "sample_properties"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/me": {
+      "get": {
+        "summary": "The GET /me endpoint retrieves the profile information of the currently authenticated user. This end",
+        "description": "The GET /me endpoint retrieves the profile information of the currently authenticated user. This endpoint is primarily used to fetch user-specific data, such as the user ID and display name, which can be utilized in user interfaces or for personalization features. Common error scenarios include database connectivity issues or the absence of a user profile, both of which will result in a 500 Internal Server Error. Performance considerations are minimal for this endpoint, but it is important to ensure that the database is properly connected for optimal response times. Security requirements include proper authentication to ensure that only authorized users can access their own profile information.",
+        "operationId": "get_me",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "example": "20"
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "example": "English"
+                    }
+                  }
+                },
+                "example": {
+                  "user_id": "example_user_id",
+                  "display_name": "Example User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "The PUT /me endpoint is designed to update the current user's profile information, specifically thei",
+        "description": "The PUT /me endpoint is designed to update the current user's profile information, specifically their display name. This endpoint is useful in scenarios where a user wants to personalize their account by changing their display name, which is often displayed publicly. Common error scenarios include providing an empty display name or exceeding the character limit of 50, which will result in a 400 Bad Request response. Additionally, if there are issues connecting to the database, a 500 Internal Server Error may occur. This endpoint requires user authentication to ensure that only authorized users can update their profiles.",
+        "operationId": "put_me",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "profile_data",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string",
+                      "example": "20"
+                    },
+                    "display_name": {
+                      "type": "string",
+                      "example": "English"
+                    }
+                  }
+                },
+                "example": {
+                  "user_id": "user123",
+                  "display_name": "New Display Name"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/profile/by-id/{user_id}": {
+      "get": {
+        "summary": "This endpoint retrieves a user's display name based on their user ID. It is primarily used in applic",
+        "description": "This endpoint retrieves a user's display name based on their user ID. It is primarily used in applications where user profiles are displayed, allowing for customization of user interactions. Common error scenarios include database connection issues, which may result in a 500 Internal Server Error. Performance considerations are not explicitly defined in the code, but the function is asynchronous, suggesting it is designed for efficient handling of I/O operations. Security requirements are not detailed in the provided code, but typical practices would include ensuring that the user ID is validated and that appropriate authentication mechanisms are in place.",
+        "operationId": "get_profile_by_id_user_id",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: user_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "display_name": {
+                      "type": "string",
+                      "example": "English"
+                    }
+                  }
+                },
+                "example": {
+                  "display_name": "JohnDoe"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{invite_code}": {
+      "get": {
+        "summary": "The GET /{invite_code} endpoint retrieves the details of a specific invite using its unique invite c",
+        "description": "The GET /{invite_code} endpoint retrieves the details of a specific invite using its unique invite code. This endpoint is primarily used to check the status and details of an invite, such as its associated group and expiration date. Common error scenarios include cases where the invite code does not exist (404 Not Found), the invite has expired (410 Gone), or there is a server error (500 Internal Server Error). There are no pagination or rate limiting considerations evident from the code, and security requirements are not explicitly defined, but it is advisable to implement authentication to protect sensitive invite data.",
+        "operationId": "get_invite_code",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "invite_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "invite_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: invite_code"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "en"
+                    },
+                    "group_id": {
+                      "type": "string",
+                      "example": "20"
+                    },
+                    "group_name": {
+                      "type": "string",
+                      "example": "English"
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "example": "example_expires_at"
+                    }
+                  }
+                },
+                "example": {
+                  "code": "INVITE123",
+                  "group_id": "GROUP456",
+                  "group_name": "Example Group",
+                  "expires_at": "2023-12-31T23:59:59Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{invite_code}/accept": {
+      "post": {
+        "summary": "This endpoint allows a user to accept an invitation to join a group using a unique invite code. It i",
+        "description": "This endpoint allows a user to accept an invitation to join a group using a unique invite code. It is primarily used when a user receives an invite to collaborate or participate in a group, enabling them to become a member. Common error scenarios include invalid invite codes, expired invites, and attempts to join a non-existent group. Performance considerations include ensuring the database is connected and handling potential delays in database operations. Security requirements involve user authentication, as the endpoint relies on the current user's ID to process the invitation.",
+        "operationId": "post_invite_code_accept",
+        "tags": [
+          "Flask"
+        ],
+        "parameters": [
+          {
+            "name": "invite_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "invite_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path parameter: invite_code"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "example_message"
+                    },
+                    "group_id": {
+                      "type": "string",
+                      "example": "20"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Joined group successfully",
+                  "group_id": "60d5ec49f1c7f5b0e8c9e5c1"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
